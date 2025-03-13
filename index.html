@@ -817,16 +817,31 @@
             }
         }
 
+        // 打开模态框
+        function openModal(modal) {
+            modal.style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal(modal) {
+            modal.style.display = 'none';
+        }
+
         // 处理管理员登录
-        function handleAdminLogin() {
+        async function handleAdminLogin() {
             const username = document.getElementById('adminUsername').value;
             const password = document.getElementById('adminPassword').value;
             
-            if (username === adminCredentials.username && password === adminCredentials.password) {
+            // 计算密码的 SHA-256 哈希值
+            const passwordHash = await sha256(password);
+            
+            if (username === adminCredentials.username && passwordHash === adminCredentials.passwordHash) {
                 isAdmin = true;
                 localStorage.setItem('isAdmin', 'true');
                 adminLoginBtn.textContent = '退出管理员';
                 addConferenceButton.style.display = 'block';
+                exportDataBtn.style.display = 'block';
+                importDataBtn.style.display = 'block';
                 actionsHeader.style.display = '';
                 updateTableView();
                 updateCardView();
@@ -839,6 +854,28 @@
             } else {
                 showNotification('用户名或密码错误', true);
             }
+        }
+
+        // 处理建议提交
+        function handleSuggestion() {
+            const suggestionData = {
+                name: document.getElementById('suggesterName').value,
+                email: document.getElementById('suggesterEmail').value,
+                conference: document.getElementById('suggestedConference').value,
+                type: document.getElementById('suggestionType').value,
+                details: document.getElementById('suggestionDetails').value,
+                source: document.getElementById('suggestionSource').value
+            };
+            
+            // 这里可以添加发送建议到服务器的代码
+            console.log('收到建议:', suggestionData);
+            
+            // 关闭模态框并显示成功消息
+            closeModal(suggestChangeModal);
+            showNotification('感谢您的建议！我们会尽快处理');
+            
+            // 重置表单
+            document.getElementById('suggestionForm').reset();
         }
 
         // 按截止日期对会议排序
